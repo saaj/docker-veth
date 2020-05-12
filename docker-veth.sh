@@ -42,6 +42,7 @@ get_veth () {
             veth="not found"
         else
             veth=$(ip -o link | grep ^$ifindex | sed -n -e 's/.*\(veth[[:alnum:]]*@if[[:digit:]]*\).*/\1/p')
+            ips=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" $1)
         fi
     fi
 }
@@ -50,5 +51,5 @@ while IFS= read -r line
 do
     containerid=$(echo $line | awk '{ print $1 }')
     get_veth $containerid
-    echo "$veth $line"
+    echo "$veth $ips $line"
 done <<< "$containers"
